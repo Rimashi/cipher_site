@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cyphers - {{.Title}}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Roboto+Flex:opsz@8..144&display=swap"
+        rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/static/js/script.js" defer></script>
+</head>
+
+<body>
+    <header class="sub-header">
+        <div class="logo"><a href="/">Cyphers</a></div>
+        <div class="tabs">
+            <div class="tab active" data-tab="encrypt">Зашифровать</div>
+            <div class="tab" data-tab="decrypt">Расшифровать</div>
+            <div class="tab" data-tab="info">Описание</div>
+        </div>
+        <div class="burger" aria-label="Открыть меню навигации" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </div>
+    </header>
+
+    <h1 class="cipher-title">{{.Title}}</h1>
+
+    <main class="tab-content">
+        <section id="encrypt" class="tab-pane active">
+            <textarea placeholder="Введите текст для шифрования..."></textarea>
+            {{if .HasKey}}
+            <div class="input-group">
+                <label>Ключ:</label>
+                <input type="text" class="key-input" placeholder="Введите ключ">
+            </div>
+            {{end}}
+
+            <!-- Переключатель для шифра Виженера -->
+            {{if eq .Cipher "Vigenere"}}
+            <div class="input-group">
+                <label>Режим:</label>
+                <div class="switch-container">
+                    <div class="switch">
+                        <input type="radio" id="mode-plaintext" name="mode" value="plaintext" checked>
+                        <label for="mode-plaintext">Самоключ</label>
+
+                        <input type="radio" id="mode-ciphertext" name="mode" value="ciphertext">
+                        <label for="mode-ciphertext">Ключ-шифртекст</label>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+
+            <button>Зашифровать</button>
+            <div class="result-box">
+                <label>Результат:</label>
+                <div class="result" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section id="decrypt" class="tab-pane">
+            <textarea placeholder="Введите текст для расшифровки..."></textarea>
+            {{if .HasKey}}
+            <div class="input-group">
+                <label>Ключ:</label>
+                <input type="text" class="key-input" placeholder="Введите ключ">
+            </div>
+            {{end}}
+
+            <!-- Переключатель для шифра Виженера -->
+            {{if eq .Cipher "Vigenere"}}
+            <div class="input-group">
+                <label>Режим:</label>
+                <div class="switch-container">
+                    <div class="switch">
+                        <input type="radio" id="mode-plaintext-decrypt" name="mode" value="plaintext" checked>
+                        <label for="mode-plaintext-decrypt">Самоключ</label>
+
+                        <input type="radio" id="mode-ciphertext-decrypt" name="mode" value="ciphertext">
+                        <label for="mode-ciphertext-decrypt">Ключ-шифртекст</label>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+
+            <button>Расшифровать</button>
+            <div class="result-box">
+                <label>Результат:</label>
+                <div class="result" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section id="info" class="tab-pane">
+            <div class="info-section">
+                <h2>История шифра</h2>
+                <p>Шифр Виженера — усовершенствованный шифр замены, использующий ключевое слово...</p>
+            </div>
+
+            <div class="info-section">
+                <h2>Как работает</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Выберите режим работы</h3>
+                            <p>Шифр Виженера поддерживает два режима: с самоключом и с ключом-шифртекстом</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Введите ключевое слово</h3>
+                            <p>Ключ используется для инициализации процесса шифрования</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Введите текст</h3>
+                            <p>Текст будет зашифрован или расшифрован в зависимости от выбранного режима</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Пример</h2>
+                <div class="interactive-demo">
+                    <div class="input-group">
+                        <label>Исходный текст:</label>
+                        <input type="text" value="HELLO" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>Ключ:</label>
+                        <input type="text" value="KEY" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>Режим:</label>
+                        <select class="mode-demo">
+                            <option value="plaintext">Самоключ</option>
+                            <option value="ciphertext">Ключ-шифртекст</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Результат:</label>
+                        <input type="text" value="RIJVS" readonly class="result-output">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="side-menu hidden">
+        <ul>
+            {{ range .Ciphers}}
+            <li><a href="/cipher/{{.ID}}">{{.Name}}</a></li>
+            {{end}}
+        </ul>
+    </nav>
+
+    <div class="overlay"></div>
+</body>
+
+</html>
