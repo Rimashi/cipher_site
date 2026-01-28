@@ -75,25 +75,6 @@ func getLetterFromPosition(pos int, isUpper bool, mod int) rune {
 	}
 }
 
-// Создаем расширенный ключ нужной длины
-func expandKey(key string, length int) []rune {
-	// Преобразуем строку ключа в срез рун
-	keyRunes := []rune(key)
-
-	// Создаем новый срез рун нужной длины
-	expandedKey := make([]rune, length)
-
-	// Заполняем расширенный ключ, циклически повторяя исходный ключ
-	for i := 0; i < length; i++ {
-		// Берем символ из ключа по модулю его длины
-		// Это обеспечивает циклическое повторение ключа
-		expandedKey[i] = keyRunes[i%len(keyRunes)]
-	}
-
-	// Возвращаем расширенный ключ
-	return expandedKey
-}
-
 // Основная функция шифрования/дешифрования
 func belazo(text, key string, encrypt bool) string {
 	// Нормализуем текст и ключ
@@ -104,35 +85,33 @@ func belazo(text, key string, encrypt bool) string {
 
 	// Создаем расширенный ключ той же длины, что и текст
 	textRunes := []rune(text)
-	expandedKey := expandKey(key, len(textRunes))
+	keyRunes := []rune(key)
+	keyLen := len(keyRunes)
+	keyIndex := 0
 
-	letterCount := 0 // Счетчик букв (игнорируем не-буквы)
+	for _, sim := range textRunes {
 
-	// Обрабатываем каждый символ текста
-	for i, sim := range textRunes {
-		// Получаем позицию и мощность алфавита для символа ключа
-		if keyPos, mod, isKeyLetter := getLetterPosition(expandedKey[i]); isKeyLetter {
-			// Получаем позицию и мощность алфавита для символа текста
-			if textPos, _, isTextLetter := getLetterPosition(sim); isTextLetter {
-				// Определяем регистр буквы
-				isUpper := (sim >= 'A' && sim <= 'Z') || (sim >= 'А' && sim <= 'Я')
+		textPos, mod, isTextLetter := getLetterPosition(sim)
+		if isTextLetter {
 
-				var newPos int
-				if encrypt {
-					// Шифрование: добавляем позицию ключа
-					newPos = (textPos + keyPos) % mod
-				} else {
-					// Дешифрование: вычитаем позицию ключа
-					newPos = (textPos - keyPos) % mod
-				}
+			keyRune := keyRunes[keyIndex%keyLen]
+			keyPos, _, _ := getLetterPosition(keyRune)
 
-				// Получаем новую букву и добавляем в результат
-				result.WriteRune(getLetterFromPosition(newPos, isUpper, mod))
-				letterCount++
-				continue // Переходим к следующему символу
+			isUpper := (sim >= 'A' && sim <= 'Z') || (sim >= 'А' && sim <= 'Я')
+
+			var newPos int
+			if encrypt {
+				newPos = (textPos + keyPos) % mod
+			} else {
+				newPos = (textPos - keyPos) % mod
 			}
+
+			result.WriteRune(getLetterFromPosition(newPos, isUpper, mod))
+			keyIndex++ // 🔥 ключ сдвигается ТОЛЬКО на буквах
+			continue
 		}
-		// Если символ не буква - добавляем без изменений
+
+		// пробелы и знаки — как есть
 		result.WriteRune(sim)
 	}
 
